@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ClickUp Dialer</title>
+  <script src="https://sdk.twilio.com/js/client/v1.13/twilio.min.js"></script>
+</head>
+<body>
+
+<h3>ClickUp Dialer</h3>
+
+<input type="text" id="phoneNumber" placeholder="+639XXXXXXXXX">
+<button onclick="makeCall()">Call</button>
+
+<script>
+let device;
+
+fetch("https://clickup-dialer-4911.twil.io/token?identity=agent1")
+  .then(res => res.json())
+  .then(data => {
+    device = new Twilio.Device(data.token);
+  });
+
+function makeCall() {
+  const number = document.getElementById("phoneNumber").value;
+
+  device.connect({
+    params: { To: number }
+  });
+}
+</script>
+
+</body>
+</html>
