@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ClickUp Dialer</title>
-  <script src="https://sdk.twilio.com/js/client/v1.13/twilio.min.js"></script>
+  <script src="https://sdk.twilio.com/js/voice/latest/twilio.min.js"></script>
 </head>
 <body>
 
 <h3>ClickUp Dialer</h3>
 
-<input type="text" id="phoneNumber" placeholder="+639XXXXXXXXX">
-<button onclick="makeCall()">Call</button>
+<input type="text" id="phoneNumber" placeholder="+15557771234">
+<button id="callBtn">Call</button>
 
 <script>
 let device;
 
-fetch("https://clickup-dialer-4911.twil.io/token?identity=agent1")
-  .then(res => res.json())
-  .then(data => {
-    device = new Twilio.Device(data.token);
+async function init() {
+  const response = await fetch("https://clickup-dialer-4911.twil.io/token?identity=agent1");
+  const data = await response.json();
+
+  device = new Twilio.Device(data.token);
+
+  device.on("ready", () => {
+    console.log("Device ready");
   });
 
-function makeCall() {
+  device.on("error", (error) => {
+    console.error("Device error:", error);
+  });
+}
+
+document.getElementById("callBtn").onclick = function () {
   const number = document.getElementById("phoneNumber").value;
+
+  if (!device) {
+    console.error("Device not initialized");
+    return;
+  }
 
   device.connect({
     params: { To: number }
   });
-}
+};
+
+init();
 </script>
 
 </body>
