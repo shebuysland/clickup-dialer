@@ -1,48 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <script src="https://sdk.twilio.com/js/voice/latest/twilio.min.js"></script>
-</head>
-<body>
-
-<h3>ClickUp Dialer</h3>
-
-<input type="text" id="phoneNumber" placeholder="+15557771234">
-<button id="callBtn">Call</button>
+<script src="https://sdk.twilio.com/js/voice/releases/2.3.0/twilio.min.js"></script>
 
 <script>
 let device;
 
 async function init() {
-  const response = await fetch("https://clickup-dialer-4911.twil.io/token?identity=agent1");
-  const data = await response.json();
+  try {
+    const response = await fetch("https://clickup-dialer-4911.twil.io/token?identity=agent1");
+    const data = await response.json();
 
-  device = new Twilio.Device(data.token);
+    device = new Twilio.Device(data.token, {
+      logLevel: 1
+    });
 
-  device.on("ready", () => {
-    console.log("Device ready");
-  });
+    device.on("registered", () => {
+      console.log("Device ready");
+    });
 
-  device.on("error", (error) => {
-    console.error("Device error:", error);
-  });
+    device.on("error", (error) => {
+      console.error("Twilio Error:", error);
+    });
+
+  } catch (err) {
+    console.error("Init error:", err);
+  }
 }
 
-document.getElementById("callBtn").onclick = function () {
-  const number = document.getElementById("phoneNumber").value;
+init();
 
+function makeCall() {
   if (!device) {
     console.error("Device not initialized");
     return;
   }
 
+  const number = document.getElementById("phoneNumber").value;
+
   device.connect({
     params: { To: number }
   });
-};
 
-init();
+  console.log("Calling:", number);
+}
 </script>
-
-</body>
-</html>
